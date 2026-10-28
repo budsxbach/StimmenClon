@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0d11">
+<title>StimmenClon Studio – Stimme lokal aufnehmen</title>
+<meta name="description" content="Lokale Sprachaufnahme im Browser: Mono, 48 kHz, PCM-WAV. Ohne Upload, ohne Cloud, ohne Stimmeffekte.">
+<!-- Diese CSP verhindert jeden Netzwerkzugriff der App (kein Upload möglich). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data:; media-src blob: data:; style-src 'self'; script-src 'self' blob:; worker-src 'self' blob:; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d11'/%3E%3Cg fill='%23d8b26a'%3E%3Crect x='14' y='26' width='5' height='12' rx='2.5'/%3E%3Crect x='24' y='18' width='5' height='28' rx='2.5'/%3E%3Crect x='34' y='12' width='5' height='40' rx='2.5'/%3E%3Crect x='44' y='22' width='5' height='20' rx='2.5'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="./" aria-label="StimmenClon Studio – Startseite">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">StimmenClon</span>
+        <span class="brand-sub">Studio</span>
+      </span>
+    </a>
+    <div class="header-right">
+      <span class="pill pill-local">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+        100 % lokal
+      </span>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="shell">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <p class="eyebrow">Sprachaufnahme für Voice-Cloning-Datensätze</p>
+    <h1 id="hero-title">Nimm deine Stimme auf – <span class="gold-text">in Ruhe, in guter Qualität.</span></h1>
+    <p class="hero-lead">
+      Mono, 48.000 Hz, unkomprimiertes PCM-WAV. Ohne Rauschunterdrückung, ohne Echo, ohne Effekte –
+      und ohne dass eine einzige Audiodatei dein Gerät verlässt.
+    </p>
+    <ul class="spec-chips" aria-label="Aufnahmeformat">
+      <li>Mono</li>
+      <li>48 kHz</li>
+      <li>16-Bit PCM</li>
+      <li>WAV / ZIP</li>
+      <li>≥ 10 Minuten</li>
+    </ul>
+  </section>
+
+  <div class="notice-stack">
+    <section class="notice notice-privacy" aria-labelledby="privacy-title">
+      <span class="notice-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/>
+        </svg>
+      </span>
+      <div>
+        <h2 id="privacy-title">Deine Daten bleiben bei dir</h2>
+        <p class="notice-quote">„Die Aufnahmen bleiben auf diesem Gerät, bis du sie selbst herunterlädst oder löschst. Es erfolgt kein automatischer Upload.“</p>
+      </div>
+    </section>
+
+    <section class="notice notice-consent" aria-labelledby="consent-title">
+      <span class="notice-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3.5l2.6 1.9 3.2-.2.9 3.1 2.3 2.2-2.3 2.2-.9 3.1-3.2-.2L12 20.5 9.4 18.6l-3.2.2-.9-3.1L3 13.5l2.3-2.2.9-3.1 3.2.2z"/><path d="M12 8.6v4.2"/><path d="M12 15.7v.1"/>
+        </svg>
+      </span>
+      <div>
+        <h2 id="consent-title">Nur mit Einwilligung</h2>
+        <p class="notice-quote">„Verwende ausschließlich deine eigene Stimme oder eine Stimme, für deren Nutzung du eine ausdrückliche Einwilligung besitzt.“</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="layout">
+
+    <!-- ───────────── Recorder ───────────── -->
+    <section class="card recorder-card" aria-labelledby="rec-title">
+      <div class="card-head">
+        <h2 id="rec-title">Aufnahme</h2>
+        <span class="status-pill" id="mic-status" data-state="off">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="mic-status-text">Mikrofon nicht aktiv</span>
+        </span>
+      </div>
+
+      <!-- Schritt 1: Zustimmung -->
+      <div class="gate" id="gate">
+        <p class="gate-text">
+          Der Browser fragt dich erst, wenn du es hier auslöst. Ohne deine Zustimmung wird kein Mikrofon geöffnet –
+          und es wird nichts gesendet oder gespeichert, außer lokal in diesem Browser.
+        </p>
+
+        <div class="field">
+          <label for="device-select">Mikrofon</label>
+          <select id="device-select" class="select">
+            <option value="">Standardmikrofon des Systems</option>
+          </select>
+          <p class="field-hint" id="device-hint">Die Gerätenamen erscheinen, sobald du den Zugriff erlaubst.</p>
+        </div>
+
+        <button class="btn btn-primary btn-lg" id="enable-mic" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/><path d="M8.5 21h7"/>
+          </svg>
+          Mikrofonzugriff erlauben
+        </button>
+        <p class="gate-note">
+          Dein Browser zeigt danach einen Berechtigungsdialog. Bei „Blockieren“ wird nichts aufgenommen.
+        </p>
+      </div>
+
+      <!-- Schritt 2: Studio -->
+      <div class="studio" id="studio" hidden>
+
+        <div class="studio-top">
+          <div class="device-row">
+            <label for="device-select-live" class="sr-only">Aktives Mikrofon</label>
+            <select id="device-select-live" class="select select-sm">
+              <option value="">Standardmikrofon des Systems</option>
+            </select>
+          </div>
+          <details class="tech">
+            <summary>Technische Details</summary>
+            <dl id="tech-list" class="tech-list"></dl>
+            <p class="tech-note" id="tech-warning" hidden></p>
+          </details>
+        </div>
+
+        <!-- Pegel -->
+        <div class="meter-block">
+          <div class="meter-head">
+            <span class="meter-label">Eingangspegel</span>
+            <span class="meter-readout"><span id="meter-db">−∞</span> dBFS</span>
+          </div>
+          <div class="meter" id="meter" role="img" aria-label="Eingangspegel: kein Signal">
+            <div class="meter-track">
+              <div class="meter-gradient"></div>
+              <div class="meter-mask" id="meter-mask"></div>
+              <div class="meter-peak" id="meter-peak" hidden></div>
+            </div>
+            <div class="meter-scale" aria-hidden="true">
+              <span>−60</span><span>−48</span><span>−36</span><span>−24</span><span>−12</span><span>−6</span><span>0</span>
+            </div>
+          </div>
+          <p class="clip-warning" id="clip-warning" hidden role="alert">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.5l9 16H3z"/><path d="M12 9.5v4.5"/><path d="M12 17h.01"/>
+            </svg>
+            <span id="clip-warning-text">Übersteuerung erkannt – bitte leiser sprechen oder weiter vom Mikrofon weggehen.</span>
+          </p>
+        </div>
+
+        <!-- Zeit & Fortschritt -->
+        <div class="time-block">
+          <div class="timer-row">
+            <span class="timer" id="timer" aria-live="off">00:00,0</span>
+            <span class="timer-meta" id="timer-meta">Bereit</span>
+          </div>
+          <div class="progress" id="progress" role="progressbar" aria-label="Fortschritt bis zur Ziel-Aufnahmedauer"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0 Prozent des Ziels">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-meta">
+            <label for="target-select" class="progress-target-label">Ziel</label>
+            <select id="target-select" class="select select-xs">
+              <option value="60">1 Minute</option>
+              <option value="180">3 Minuten</option>
+              <option value="300">5 Minuten</option>
+              <option value="600" selected>10 Minuten</option>
+              <option value="900">15 Minuten</option>
+              <option value="1200">20 Minuten</option>
+              <option value="1800">30 Minuten</option>
+            </select>
+            <span class="progress-percent" id="progress-percent">0 %</span>
+          </div>
+        </div>
+
+        <!-- Transport -->
+        <div class="transport">
+          <div class="record-slot">
+            <button class="record-btn" id="record-button" type="button" aria-label="Aufnahme starten" aria-describedby="shortcut-hint">
+              <span class="record-shape" id="record-shape" aria-hidden="true"></span>
+            </button>
+            <span class="record-caption" id="record-caption" aria-hidden="true">Aufnahme starten</span>
+          </div>
+
+          <div class="transport-side">
+            <button class="btn btn-ghost" id="pause-button" type="button" disabled>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" id="pause-icon">
+                <path d="M9 5v14M15 5v14"/>
+              </svg>
+              <span id="pause-label">Pause</span>
+            </button>
+            <button class="btn btn-ghost" id="stop-button" type="button" disabled>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="5" y="5" width="14" height="14" rx="2"/>
+              </svg>
+              Beenden
+            </button>
+          </div>
+        </div>
+
+        <p class="shortcut-hint" id="shortcut-hint">
+          Tastatur: <kbd>R</kbd> Start/Stopp · <kbd>Leertaste</kbd> Pause/Fortsetzen · <kbd>Esc</kbd> Beenden
+        </p>
+
+        <p class="inline-status" id="inline-status" role="status" aria-live="polite"></p>
+      </div>
+
+      <p class="error-box" id="error-box" role="alert" hidden></p>
+
+      <div class="store-banner" id="storage-banner" hidden>
+        <strong>Hinweis zum Speicher:</strong> <span id="storage-banner-text"></span>
+      </div>
+    </section>
+
+    <!-- ───────────── Sprechtext & Tipps ───────────── -->
+    <aside class="side">
+      <section class="card script-card" aria-labelledby="script-title">
+        <div class="card-head">
+          <h2 id="script-title">Sprechtext</h2>
+          <div class="script-switch" role="group" aria-label="Sprechtext auswählen">
+            <button type="button" class="chip is-active" data-script="a" aria-pressed="true">Text&nbsp;A</button>
+            <button type="button" class="chip" data-script="b" aria-pressed="false">Text&nbsp;B</button>
+          </div>
+        </div>
+
+        <article class="script-text" id="script-a">
+          <p>Guten Tag. Ich spreche jetzt einige Sätze ein, damit meine Stimme klar und deutlich aufgenommen wird. Ich sitze aufrecht, halte einen ruhigen Abstand zum Mikrofon und spreche in gleichmäßigem Tempo.</p>
+          <p>Zwölf große Würfel lagen neben dem offenen Fenster, während draußen leise der Regen fiel. Jürgen fuhr mit dem Fahrrad über die Brücke, grüßte die Nachbarin und lächelte über den kleinen Hund, der fröhlich durch die Pfützen sprang.</p>
+          <p>Eine gute Aufnahme braucht keine Eile. Ich atme ruhig, mache nach jedem Satz eine kurze Pause und beginne den nächsten Satz erst, wenn ich wieder Luft geholt habe. So bleiben die Wörter sauber getrennt und später gut zu bearbeiten.</p>
+          <p>Im Jahr 2026 sind schnelle Verbindungen selbstverständlich. Trotzdem prüfe ich jede Zahl zweimal: siebenundzwanzig, dreiundvierzig, einhundertfünf, neunhundertneunundneunzig. Zahlen sind ein guter Test für eine deutliche Aussprache.</p>
+          <p>Zum Schluss lese ich noch eine Frage vor: Möchtest du die Aufnahme jetzt anhören, erneut einsprechen oder als WAV-Datei sichern? Jede dieser Möglichkeiten steht dir jederzeit offen, und nichts davon verlässt dieses Gerät.</p>
+        </article>
+
+        <article class="script-text" id="script-b" hidden>
+          <p>Meine Stimme ist heute ruhig und ausgeruht. Ich spreche langsam, deutlich und in natürlicher Tonhöhe, so wie ich auch im Gespräch mit Freunden sprechen würde.</p>
+          <p>Am frühen Morgen lag Nebel über den Feldern. Die Straßen waren still, nur ein einzelner Vogel sang, und der Kaffee dampfte in der Tasse. Ich mag diese Stunden, in denen die Welt noch schläft und alles langsam beginnt.</p>
+          <p>Emotion entsteht durch kleine Unterschiede: ein leichtes Heben der Stimme, eine kurze Pause, ein freundliches Lächeln im Klang. Ich lasse den Sätzen Zeit und betone nicht jedes Wort gleich stark.</p>
+          <p>Äpfel, Öl, Übermut, Eis, Augen, Eule – fünf Vokale, viele Möglichkeiten. Ich spreche sie deutlich und ohne zu übertreiben, denn natürlich klingt besser als künstlich.</p>
+          <p>Ich beende den Text mit einem ruhigen Satz: Danke, dass du dir Zeit nimmst, deine Stimme sorgfältig aufzunehmen. Sie ist etwas Persönliches, und sie verdient eine gute Aufnahme.</p>
+        </article>
+
+        <p class="script-hint">Lies in deinem normalen Sprechtempo. Lieber mehrere kurze Takes als ein langer, unsauberer.</p>
+      </section>
+
+      <section class="card tips-card" aria-labelledby="tips-title">
+        <h2 id="tips-title">Kurz gesagt</h2>
+        <ul class="tips">
+          <li><strong>Abstand:</strong> 15–25 cm zum Mikrofon, leicht seitlich sprechen.</li>
+          <li><strong>Raum:</strong> Teppich, Vorhänge, Bett – weiche Flächen dämpfen Hall.</li>
+          <li><strong>Pegel:</strong> Ausschläge um −18 bis −6 dBFS, nie im roten Bereich.</li>
+          <li><strong>Ruhe:</strong> Lüftung aus, Handy stumm, keine Musik im Hintergrund.</li>
+          <li><strong>Pausen:</strong> 2–3 Sekunden Stille zwischen den Absätzen.</li>
+        </ul>
+        <p class="tips-link">Ausführliche Tipps stehen in der <code>README.md</code>.</p>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ───────────── Aufnahmen ───────────── -->
+  <section class="card recordings-card" aria-labelledby="takes-title">
+    <div class="card-head card-head-wrap">
+      <div>
+        <h2 id="takes-title">Aufnahmen</h2>
+        <p class="card-sub" id="takes-summary">Noch keine Aufnahme vorhanden.</p>
+      </div>
+      <div class="takes-actions">
+        <button class="btn btn-primary" id="export-zip" type="button" disabled>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4 17.5V20h16v-2.5"/>
+          </svg>
+          Alle als ZIP exportieren
+        </button>
+        <button class="btn btn-ghost btn-danger" id="delete-all" type="button" disabled>Alle löschen</button>
+      </div>
+    </div>
+
+    <p class="export-status" id="export-status" role="status" aria-live="polite"></p>
+
+    <div class="takes" id="takes-list"></div>
+
+    <div class="empty-state" id="empty-state">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/>
+      </svg>
+      <p>Hier erscheinen deine Takes – nummeriert, abspielbar und als WAV herunterladbar.</p>
+    </div>
+  </section>
+
+  <!-- ───────────── Speicherort ───────────── -->
+  <section class="card info-card" aria-labelledby="storage-title">
+    <h2 id="storage-title">Wo liegen die WAV-Dateien?</h2>
+    <div class="info-grid">
+      <div>
+        <h3>1 · Während der Sitzung</h3>
+        <p>Die Rohdaten liegen im Arbeitsspeicher dieses Browser-Tabs. Nichts wird über das Netzwerk gesendet – die Seite blockiert Verbindungen aktiv per Content-Security-Policy.</p>
+      </div>
+      <div>
+        <h3>2 · In diesem Browser</h3>
+        <p>Fertige Takes speichert die App zusätzlich in der lokalen <em>IndexedDB</em> deines Browsers. Sie überstehen ein Neuladen der Seite und bleiben dort, bis du sie löschst – auch ohne Internetverbindung.</p>
+      </div>
+      <div>
+        <h3>3 · Auf deinem Gerät</h3>
+        <p>Erst mit <em>„WAV herunterladen“</em> oder <em>„Alle als ZIP exportieren“</em> entsteht eine Datei – sie landet im Download-Ordner deines Systems, den du selbst bestimmst.</p>
+      </div>
+      <div>
+        <h3>4 · Wenn du löschst</h3>
+        <p>Löschen entfernt den Take aus der Liste und aus der Browser-Datenbank. Bereits heruntergeladene Dateien bleiben natürlich in deinem Download-Ordner.</p>
+      </div>
+    </div>
+    <p class="info-foot">Rechne mit rund <strong>5,8 MB pro Minute</strong> (48 kHz · 16 Bit · Mono) – zehn Minuten entsprechen etwa 58 MB.</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <p>StimmenClon Studio · lokale Sprachaufnahme im Browser · keine Cloud, kein Upload, keine Stimmeffekte.</p>
+    <p class="footer-small">Nutze nur deine eigene Stimme oder eine Stimme, für deren Nutzung du eine ausdrückliche Einwilligung besitzt.</p>
+  </div>
+</footer>
+
+<div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+<script src="js/wav.js"></script>
+<script src="js/zip.js"></script>
+<script src="js/db.js"></script>
+<script src="js/worklet-source.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
