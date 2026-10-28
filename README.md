@@ -54,6 +54,40 @@ npx serve . -l 8000
 Der mitgelieferte `server.js` liefert **nur** statische Dateien aus. Er hat keine
 Upload-Schnittstelle und speichert nichts.
 
+### Warum verlangt der Browser HTTPS?
+
+Browser erlauben das Mikrofon nur in einem „sicheren Kontext“. Das ist erfüllt bei
+`https://…` **und** bei `http://localhost`. Blockiert der Browser den Zugriff, liegt es fast
+immer an einer dieser Ursachen:
+
+| Ursache | Lösung |
+| --- | --- |
+| Seite über `file://` geöffnet | lokalen Server starten (Abschnitt 1) |
+| `http://` mit IP oder Hostname, z. B. `http://192.168.1.20:8000` | HTTPS nutzen (siehe unten) oder `localhost` am aufnehmenden Gerät |
+| App läuft in einem eingebetteten Frame/Vorschau | Seite in einem eigenen Tab öffnen – Frames brauchen zusätzlich `allow="microphone"` |
+| Zugriff zuvor „blockiert“ | Schloss-Symbol in der Adressleiste → Mikrofon erlauben, Seite neu laden |
+
+Am PC genügt `http://localhost:8000`. Für Smartphone, Tablet oder Zugriff aus dem Netz brauchst
+du echtes HTTPS – dafür liegen zwei Wege bereit:
+
+**GitHub Pages** (kostenlos, Datei `.github/workflows/deploy-pages.yml` ist enthalten):
+
+1. Repository → **Settings → Pages** → bei *Source* „**GitHub Actions**“ wählen.
+2. Ein Push auf `main` (oder „Run workflow“ im Actions-Tab) veröffentlicht die App.
+3. Adresse: `https://<benutzer>.github.io/StimmenClon/` – HTTPS inklusive.
+
+Der Workflow kopiert ausschließlich `index.html`, `styles.css` und `js/` in die Veröffentlichung.
+Es werden keine Audiodateien hochgeladen und keine Aufnahmen gespeichert.
+
+**Vercel / Netlify** funktionieren ebenso: Repository importieren, Framework „Other“, kein Build-
+Command, Output-Verzeichnis `.` (die App ist bereits statisch). Achte bei Vercel darauf, den
+Deployment-Schutz („Vercel Authentication“) zu deaktivieren, sonst ist die Seite nur nach Login
+erreichbar.
+
+> Hinweis: Auf einer veröffentlichten HTTPS-Adresse werden nur die Programmdateien gehostet.
+> Aufnahmen entstehen im Browser des jeweiligen Geräts und bleiben dort – der Hosting-Anbieter
+> bekommt keine Audiodaten zu sehen.
+
 ---
 
 ## 2. Funktionen

@@ -1,0 +1,56 @@
+name: Deploy StimmenClon Studio to GitHub Pages
+
+# Veröffentlicht ausschließlich den App-Code (HTML/CSS/JS) als statische Seite.
+# Die Aufnahmen selbst entstehen im Browser und werden nie hochgeladen.
+
+on:
+  push:
+    branches:
+      - main
+      - arena/99991116-stimmenclon
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: GitHub Pages einrichten
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Seitendateien zusammenstellen
+        run: |
+          mkdir -p _site
+          cp index.html styles.css _site/
+          cp -r js _site/js
+          cp README.md _site/README.md
+          ls -R _site
+
+      - name: Seitendateien als Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4
