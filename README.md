@@ -19,6 +19,18 @@ von Audiodateien.
 
 ## 1. Schnellstart
 
+**Ohne Installation, direkt im Browser (HTTPS, auch am Handy):**
+
+### 👉 https://budsxbach.github.io/StimmenClon/
+
+Die Seite wird über GitHub Pages ausgeliefert und enthält ausschließlich die Programmdateien.
+Aufnahmen entstehen im Browser des jeweiligen Geräts und werden dorthin nicht übertragen.
+Auf dem Smartphone lässt sie sich über „Zum Startbildschirm hinzufügen“ wie eine App ablegen.
+
+Wer die App lieber lokal laufen lässt oder den Code ändern will: die folgenden Varianten starten
+einen Server auf dem eigenen Rechner (`http://localhost:8000` gilt im Browser ebenfalls als
+sicherer Kontext).
+
 Die App besteht aus reinen HTML-, CSS- und JavaScript-Dateien – ohne Build-Schritt,
 ohne Framework, ohne `npm install`, ohne externe Bibliotheken.
 
